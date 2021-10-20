@@ -2,72 +2,66 @@
 
 namespace App;
 
+use App\Item;
+
+/**
+ * Class GildedRose
+ *
+ * @package GildedRose
+ */
 class GildedRose
 {
-    public $name;
+    /**
+     * List of items
+     *
+     * @var
+     */
+    private static $items = [];
 
-    public $quality;
+    /**
+     * @var \GildedRose\ProductFactory
+     */
+    public static $product_factory;
 
-    public $sellIn;
-
-    public function __construct($name, $quality, $sellIn)
+    /**
+     * GildedRose constructor.
+     *
+     * @param array $items
+     * @param ProductFactory $productFactory
+     */
+    public function __construct(array $items, ProductFactory $productFactory)
     {
-        $this->name = $name;
-        $this->quality = $quality;
-        $this->sellIn = $sellIn;
+        
+        static::$items = $items;
+        static::$product_factory = $productFactory;
     }
+
+    /**
+     * Updates the quality and sell in of the items in the list
+     *
+     * @throws \App\Exceptions\FactoryClassNotFoundException
+     */
+    public static function updateQuality()
+    {
+   
+        foreach (static::$items as $item) {
+            static::$product_factory->build($item)->update();
+        }
+
+    }
+
+    /**
+     * Return Item Instance, used only in test
+     *
+     * @param array $name
+     * @param array $quality
+     * @param array $sellIn
+     */
 
     public static function of($name, $quality, $sellIn) {
-        return new static($name, $quality, $sellIn);
+   
+        return new Item($name, $quality, $sellIn);
     }
 
-    public function tick()
-    {
-        if ($this->name != 'Aged Brie' and $this->name != 'Backstage passes to a TAFKAL80ETC concert') {
-            if ($this->quality > 0) {
-                if ($this->name != 'Sulfuras, Hand of Ragnaros') {
-                    $this->quality = $this->quality - 1;
-                }
-            }
-        } else {
-            if ($this->quality < 50) {
-                $this->quality = $this->quality + 1;
-
-                if ($this->name == 'Backstage passes to a TAFKAL80ETC concert') {
-                    if ($this->sellIn < 11) {
-                        if ($this->quality < 50) {
-                            $this->quality = $this->quality + 1;
-                        }
-                    }
-                    if ($this->sellIn < 6) {
-                        if ($this->quality < 50) {
-                            $this->quality = $this->quality + 1;
-                        }
-                    }
-                }
-            }
-        }
-
-        if ($this->name != 'Sulfuras, Hand of Ragnaros') {
-            $this->sellIn = $this->sellIn - 1;
-        }
-
-        if ($this->sellIn < 0) {
-            if ($this->name != 'Aged Brie') {
-                if ($this->name != 'Backstage passes to a TAFKAL80ETC concert') {
-                    if ($this->quality > 0) {
-                        if ($this->name != 'Sulfuras, Hand of Ragnaros') {
-                            $this->quality = $this->quality - 1;
-                        }
-                    }
-                } else {
-                    $this->quality = $this->quality - $this->quality;
-                }
-            } else {
-                if ($this->quality < 50) {
-                    $this->quality = $this->quality + 1;
-                }
-            }
-        }
-    }
 }
+
